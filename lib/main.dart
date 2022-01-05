@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'util/palette.dart';
 
 void main() {
   runApp(const MyApp());
@@ -9,11 +10,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Spotify Downloader',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primaryColor: const Color.fromARGB(255, 30, 215, 96),
+        primarySwatch: Palette.spotifyColors,
       ),
-      home: const MyHomePage(title: 'Flutter Demo Home Page'),
+      home: const MyHomePage(title: 'Spotify Downloader'),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
