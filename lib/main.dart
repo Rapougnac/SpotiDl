@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'util/palette.dart';
+import 'widgets/side_menu.dart';
+import 'widgets/navigation_drawer_widget.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,57 +14,59 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Spotify Downloader',
       theme: ThemeData(
-        primaryColor: const Color.fromARGB(255, 30, 215, 96),
+        primaryColor: Colors.black,
         primarySwatch: Palette.spotifyColors,
+        fontFamily: 'Montserrat',
+        appBarTheme: const AppBarTheme(backgroundColor: Colors.black),
+        scaffoldBackgroundColor: const Color(0xFF121212),
+        iconTheme: const IconThemeData().copyWith(color: Colors.white),
+        drawerTheme: const DrawerThemeData(),
+        textTheme: TextTheme(
+          headline2: const TextStyle(
+            color: Colors.white,
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+          ),
+          headline4: TextStyle(
+            fontSize: 12,
+            color: Colors.green[300],
+            fontWeight: FontWeight.w500,
+            letterSpacing: 2,
+          ),
+          bodyText1: TextStyle(
+            color: Colors.grey[300],
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 1,
+          ),
+          bodyText2: TextStyle(
+            color: Colors.green[300],
+            letterSpacing: 1,
+          ),
+        ),
       ),
-      home: const MyHomePage(title: 'Spotify Downloader'),
       debugShowCheckedModeBanner: false,
+      home: const Shell(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-
-  final String title;
-
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
+class Shell extends StatelessWidget {
+  const Shell({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(widget.title),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text(
-              'You have pushed the button this many times:',
-            ),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headline4,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
+      drawer: const NavigationDrawerWidget(),
+      body: Column(
+        children: [
+          Expanded(
+              child: Row(
+            children: const [
+              SideMenu(),
+            ],
+          ))
+        ],
       ),
     );
   }
