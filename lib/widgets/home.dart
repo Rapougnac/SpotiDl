@@ -1,6 +1,8 @@
-export 'bottom_menu.dart';
+export 'home.dart';
 
 import 'package:flutter/material.dart';
+import 'screens/home_page.dart';
+import 'package:spotidl/util/palette.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
@@ -35,10 +37,24 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
         title: const Text('Spotify Downloader'),
         centerTitle: true,
         titleTextStyle: const TextStyle(color: Colors.white, fontSize: 20),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        toolbarHeight: 45,
+        flexibleSpace: Container(
+          decoration: const BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Palette.spotifyColors, Colors.black],
+              begin: Alignment.bottomRight,
+              end: Alignment.topLeft,
+              tileMode: TileMode.decal,
+            ),
+          ),
+        ),
       ),
       body: PageView(
         onPageChanged: onChanged,
@@ -60,26 +76,27 @@ class _HomeState extends State<Home> {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.download),
-              label: 'Download',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.settings),
-              label: 'Settings',
-            ),
-          ],
-          type: BottomNavigationBarType.fixed,
-          currentIndex: _selectedIndex,
-          selectedItemColor: Colors.pink,
-          showUnselectedLabels: false,
-          onTap: onTapped,
-          backgroundColor: const Color(0xFF262626)),
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.download),
+            label: 'Download',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.settings),
+            label: 'Settings',
+          ),
+        ],
+        type: BottomNavigationBarType.fixed,
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.white,
+        showUnselectedLabels: false,
+        onTap: onTapped,
+        backgroundColor: const Color.fromARGB(200, 38, 38, 37),
+      ),
     );
   }
 }
