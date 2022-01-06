@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'util/palette.dart';
 import 'widgets/side_menu.dart';
-import 'widgets/navigation_drawer_widget.dart';
 
 void main() {
   runApp(const MyApp());
@@ -57,7 +56,6 @@ class Shell extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      drawer: const NavigationDrawerWidget(),
       body: Column(
         children: [
           Expanded(
