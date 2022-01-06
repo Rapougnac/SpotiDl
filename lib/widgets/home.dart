@@ -37,25 +37,6 @@ class _HomeState extends State<Home> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        title: const Text('Spotify Downloader'),
-        centerTitle: true,
-        titleTextStyle: const TextStyle(color: Colors.white, fontSize: 20),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        toolbarHeight: 45,
-        flexibleSpace: Container(
-          decoration: const BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Palette.spotifyColors, Colors.black],
-              begin: Alignment.bottomRight,
-              end: Alignment.topLeft,
-              tileMode: TileMode.decal,
-            ),
-          ),
-        ),
-      ),
       body: PageView(
         onPageChanged: onChanged,
         scrollBehavior: const ScrollBehavior(
