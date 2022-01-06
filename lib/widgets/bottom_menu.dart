@@ -35,6 +35,11 @@ class _BottomMenuState extends State<BottomMenu> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Spotify Downloader'),
+        centerTitle: true,
+        titleTextStyle: const TextStyle(color: Colors.white, fontSize: 20),
+      ),
       body: PageView(
         onPageChanged: onChanged,
         scrollBehavior: const ScrollBehavior(
@@ -55,27 +60,26 @@ class _BottomMenuState extends State<BottomMenu> {
         ],
       ),
       bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chair_alt),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.h_mobiledata),
-            label: 'Home',
-          ),
-        ],
-        type: BottomNavigationBarType.fixed,
-        currentIndex: _selectedIndex,
-        selectedItemColor: Colors.pink,
-        showUnselectedLabels: true,
-        onTap: onTapped,
-        backgroundColor: const Color(0xFF262626),
-      ),
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.download),
+              label: 'Download',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.settings),
+              label: 'Settings',
+            ),
+          ],
+          type: BottomNavigationBarType.fixed,
+          currentIndex: _selectedIndex,
+          selectedItemColor: Colors.pink,
+          showUnselectedLabels: false,
+          onTap: onTapped,
+          backgroundColor: const Color(0xFF262626)),
     );
   }
 }
