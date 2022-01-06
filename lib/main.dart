@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'util/palette.dart';
-import 'widgets/side_menu.dart';
+import 'widgets/bottom_menu.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,6 +14,7 @@ class MyApp extends StatelessWidget {
       title: 'Spotify Downloader',
       theme: ThemeData(
         primaryColor: Colors.black,
+        canvasColor: Colors.black,
         primarySwatch: Palette.spotifyColors,
         fontFamily: 'Montserrat',
         appBarTheme: const AppBarTheme(backgroundColor: Colors.black),
@@ -45,7 +46,7 @@ class MyApp extends StatelessWidget {
         ),
       ),
       debugShowCheckedModeBanner: false,
-      home: const Shell(),
+      home: const Home(),
     );
   }
 }
@@ -57,14 +58,7 @@ class Shell extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
-        children: [
-          Expanded(
-              child: Row(
-            children: const [
-              SideMenu(),
-            ],
-          ))
-        ],
+        children: const [],
       ),
     );
   }

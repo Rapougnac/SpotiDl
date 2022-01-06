@@ -2,14 +2,14 @@ export 'bottom_menu.dart';
 
 import 'package:flutter/material.dart';
 
-class BottomMenu extends StatefulWidget {
-  const BottomMenu({Key? key}) : super(key: key);
+class Home extends StatefulWidget {
+  const Home({Key? key}) : super(key: key);
 
   @override
-  _BottomMenuState createState() => _BottomMenuState();
+  _HomeState createState() => _HomeState();
 }
 
-class _BottomMenuState extends State<BottomMenu> {
+class _HomeState extends State<Home> {
   int _selectedIndex = 0;
   PageController pageController = PageController(initialPage: 0);
 
