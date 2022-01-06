@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'util/palette.dart';
-import 'widgets/bottom_menu.dart';
+import 'widgets/home.dart';
 
 void main() {
   runApp(const MyApp());
