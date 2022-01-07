@@ -13,6 +13,7 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:spotify/spotify.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:spotidl/errors/not_found.dart';
+import 'package:spotidl/util/create_hidden_folder_win.dart';
 
 onSubmitted(String song, BuildContext context) async {
   final musicDir = getMusicDirectory();
@@ -99,8 +100,10 @@ onSubmitted(String song, BuildContext context) async {
       );
       return;
     }
-    final tempDir =
-        await Directory('${directory.path}${path.separator}.tmp').create();
+    final tempDir = Platform.isWindows
+        ? await createHiddenFolder('${directory.path}${path.separator}.tmp')
+        : await getTemporaryDirectory();
+    await Directory('${directory.path}${path.separator}.tmp').create();
     if (infos is Track) {
       final response =
           await http.get(Uri.parse(infos.album!.images!.first.url!));
