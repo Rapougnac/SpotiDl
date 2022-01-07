@@ -3,12 +3,14 @@ export 'home_page.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:spotidl/util/palette.dart';
 import 'package:spotify/spotify.dart';
 import 'package:spotidl/crendentials.dart' as creds;
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -78,15 +80,74 @@ class SearchBar extends StatelessWidget {
               onSubmitted: (song) async {
                 if (song.isEmpty) return;
 
-                final stream = await toStream(song);
-                final infos = await getInfos(song);
-                if (infos is Track) {
-                  // await Directory(safeFileName(tr));
-                  final file = File('D:\\' + safeFileName(infos.name!) + '.opus');
-                  final fileStream = file.openWrite();
-                  await stream.pipe(fileStream);
-                  await fileStream.flush();
-                  await fileStream.close();
+                Directory? dir;
+
+                if (Platform.isAndroid) {
+                  dir = await getExternalStorageDirectory();
+                } else {
+                  dir = await getApplicationDocumentsDirectory();
+                }
+                final musicDir = getMusicDirectory();
+                bool permissionGranted = false;
+
+                if (await Permission.storage.request().isGranted) {
+                  permissionGranted = true;
+                } else if (await Permission.storage
+                    .request()
+                    .isPermanentlyDenied) {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title:
+                          const Text('Storage Permission Permanently Denied'),
+                      content: const Text(
+                          'Please enable storage permission in settings'),
+                      actions: [
+                        TextButton(
+                          child: const Text('OK'),
+                          onPressed: () => Navigator.of(context).pop(),
+                        )
+                      ],
+                    ),
+                  );
+                } else if (await Permission.storage.request().isDenied) {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: const Text('Storage Permission Denied'),
+                      content: const Text(
+                          'Please enable storage permission in settings'),
+                      actions: [
+                        TextButton(
+                          child: const Text('OK'),
+                          onPressed: () => Navigator.of(context).pop(),
+                        )
+                      ],
+                    ),
+                  );
+                }
+
+                if (permissionGranted) {
+                  // TODO: Add a loading indicator
+                  final stream = await toStream(song);
+                  final infos = await getInfos(song);
+                  if (infos == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('Song not found'),
+                      ),
+                    );
+                    return;
+                  }
+                  if (infos is Track) {
+                    // await Directory(safeFileName(tr));
+                    final file =
+                        File('D:\\' + safeFileName(infos.name!) + '.opus');
+                    final fileStream = file.openWrite();
+                    await stream.pipe(fileStream);
+                    await fileStream.flush();
+                    await fileStream.close();
+                  }
                 }
               },
               decoration: const InputDecoration(
@@ -123,10 +184,15 @@ Future<Stream<List<int>>> toStream(String url) async {
           return stream;
         }
       // case 'playlist':
-      //   final playlist = await spotify.getPlaylist(id);
-      //   return playlist.tracks
-      //       .map((track) => track.audioStream)
-      //       .reduce((a, b) => a.merge(b));
+      //   {
+      //     final playlist = await spotify.playlists.getTracksByPlaylistId(id);
+      //     final playlistInfo = await spotify.playlists.get(id);
+      //     // Create a directory in the Downloads folder, we're in android
+      //     final dir = await getExternalStorageDirectory();
+      //     return playlist.tracks
+      //         .map((track) => track.audioStream)
+      //         .reduce((a, b) => a.merge(b));
+      //   }
       // case 'album':
       //   final album = await spotify.getAlbum(id);
       //   return album.tracks
@@ -209,5 +275,19 @@ getInfos(String url) async {
           return track;
         }
     }
+  }
+
+  throw UnimplementedError('Please implement this function');
+}
+
+Directory? getMusicDirectory() {
+  if (Platform.isAndroid) {
+    return Directory('/storage/emulated/0/Music');
+  } else if (Platform.isWindows) {
+    return Directory('${Platform.environment['USERPROFILE']}\\Music');
+  } else if (Platform.isLinux || Platform.isMacOS) {
+    return Directory('${Platform.environment['HOME']}/Music');
+  } else {
+    throw UnsupportedError('Platform not supported');
   }
 }
