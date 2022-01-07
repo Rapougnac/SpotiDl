@@ -198,6 +198,10 @@ Future<Stream<List<int>>> toStream(String url) async {
       //   return album.tracks
       //       .map((track) => track.audioStream)
       //       .reduce((a, b) => a.merge(b));
+      default:
+        {
+          throw NotFound('Song not found');
+        }
     }
   }
 
