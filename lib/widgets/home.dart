@@ -45,9 +45,7 @@ class _HomeState extends State<Home> {
         scrollDirection: Axis.horizontal,
         controller: pageController,
         children: [
-          Container(
-            color: Colors.red,
-          ),
+          const HomePage(),
           Container(
             color: Colors.yellow,
           ),
