@@ -205,7 +205,7 @@ Future<Stream<List<int>>> toStream(String url) async {
     }
   }
 
-  throw UnimplementedError('Please implement this function');
+  throw NotFound('Song not found');
 }
 
 String safeFileName(String name, {String replacment = '\''}) {
@@ -271,17 +271,17 @@ getInfos(String url) async {
     final match = matches.elementAt(0);
     final id = match.group(3);
     final type = match.group(1);
-    if (type == null || id == null) {}
+    if (type == null || id == null) throw NotFound('Song not found');
     switch (type) {
       case 'track':
         {
-          final track = await spotify.tracks.get(id!);
+          final track = await spotify.tracks.get(id);
           return track;
         }
     }
   }
 
-  throw UnimplementedError('Please implement this function');
+  throw NotFound('Song not found');
 }
 
 Directory? getMusicDirectory() {
