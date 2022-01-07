@@ -2,7 +2,6 @@ export 'home.dart';
 
 import 'package:flutter/material.dart';
 import 'screens/home_page.dart';
-import 'package:spotidl/util/palette.dart';
 
 class Home extends StatefulWidget {
   const Home({Key? key}) : super(key: key);
