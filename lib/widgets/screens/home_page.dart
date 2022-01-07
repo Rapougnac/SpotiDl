@@ -1,6 +1,9 @@
 export 'home_page.dart';
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:spotidl/util/on_submitted.dart';
 import 'package:spotidl/util/palette.dart';
 
 class HomePage extends StatelessWidget {
@@ -48,9 +51,15 @@ class HomePageBody extends StatelessWidget {
   }
 }
 
-class SearchBar extends StatelessWidget {
+class SearchBar extends StatefulWidget {
   const SearchBar({Key? key}) : super(key: key);
 
+  @override
+  _SearchBarState createState() => _SearchBarState();
+}
+
+class _SearchBarState extends State<SearchBar> {
+  bool loading = false;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -68,8 +77,10 @@ class SearchBar extends StatelessWidget {
           Expanded(
             child: TextField(
               autocorrect: false,
-              onSubmitted: (song) async {
-                
+              onSubmitted: (s) async {
+                _handleProgress(s);
+                await onSubmitted(s, context);
+                _stopProgress();
               },
               decoration: const InputDecoration(
                 border: InputBorder.none,
@@ -77,9 +88,30 @@ class SearchBar extends StatelessWidget {
               ),
             ),
           ),
+          if (loading)
+            const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                backgroundColor: Colors.blue,
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation(Colors.white),
+              ),
+            ),
         ],
       ),
     );
   }
-}
 
+  void _handleProgress(String s) {
+    setState(
+      () => loading = true,
+    );
+  }
+
+  void _stopProgress() {
+    setState(
+      () => loading = false,
+    );
+  }
+}
