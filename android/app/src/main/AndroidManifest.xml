@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.spotidl">
+    package="com.Rapou.spotidl">
    <application
         android:label="spotidl"
         android:name="${applicationName}"

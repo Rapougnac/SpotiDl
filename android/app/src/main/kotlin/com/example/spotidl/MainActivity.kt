@@ -1,4 +1,4 @@
-package com.example.spotidl
+package com.Rapou.spotidl
 
 import io.flutter.embedding.android.FlutterActivity
 
