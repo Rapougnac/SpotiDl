@@ -13,7 +13,7 @@
 *.iws
 .idea/
 
-crendentials.dart
+prod.env
 
 **/doc/api/
 **/ios/Flutter/.last_build_id
