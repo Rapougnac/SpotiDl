@@ -9,8 +9,9 @@ case "$1" in
 
 esac
 
-while IFS= read -r line
-do 
+# Remove CR from the end of the file
+sed -i '$s/\r$//' $INPUT
+while IFS='' read -r line || [[ -n "$line" ]]; do 
     DART_DEFINES="$DART_DEFINES--dart-define=$line "
 done < "$INPUT"
 echo "$DART_DEFINES"
