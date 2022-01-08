@@ -1,7 +1,5 @@
 export 'home_page.dart';
 
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:spotidl/util/on_submitted.dart';
 import 'package:spotidl/util/palette.dart';

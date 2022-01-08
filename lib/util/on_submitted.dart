@@ -24,13 +24,6 @@ onSubmitted(String song, BuildContext context) async {
       : null;
   if (song.isEmpty) return;
 
-  Directory? dir;
-
-  if (Platform.isAndroid) {
-    dir = await getExternalStorageDirectory();
-  } else {
-    dir = await getApplicationDocumentsDirectory();
-  }
   bool permissionGranted = false;
   if (Platform.isAndroid) {
     if (await Permission.storage.request().isGranted) {
@@ -69,7 +62,6 @@ onSubmitted(String song, BuildContext context) async {
   }
 
   if (permissionGranted) {
-    // TODO: Add a loading indicator
     // CircularProgressIndicator();
     Stream<List<int>> stream;
     try {
