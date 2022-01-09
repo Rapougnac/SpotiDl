@@ -9,6 +9,12 @@
             "request": "launch",
             "type": "dart",
             "program": "${workspaceFolder}/lib/main.dart",
+            "args": [
+                "--dart-define",
+                "SPOTIFY_CLIENT_ID=762w8z652726z739jdd", // Theses values are fake btw 
+                "--dart-define",
+                "SPOTIFY_CLIENT_SECRET=lshku897w76e7ie7i6e7", // Theses values are fake btw 
+            ],
         },
         {
             "name": "spotidl (profile mode)",
