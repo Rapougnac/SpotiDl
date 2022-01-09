@@ -94,13 +94,35 @@ onSubmitted(String song, BuildContext context) async {
     }
     final tempDir = Platform.isWindows
         ? await createHiddenFolder('${directory.path}${path.separator}.tmp')
-        : await getTemporaryDirectory();
+        : await Directory('${directory.path}${path.separator}.tmp')
+            .create(recursive: true);
     await Directory('${directory.path}${path.separator}.tmp').create();
     if (infos is Track) {
       final response =
           await http.get(Uri.parse(infos.album!.images!.first.url!));
 
       final _file = File('${tempDir.path}${path.separator}album.jpg');
+      if (!_file.existsSync()) {
+        try {
+          await _file.create();
+        } on FileSystemException {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Error'),
+              content: const Text(
+                  'There was an error creating the album cover, please try again, or check your storage permission.\nMake sure to allow writing permission'),
+              actions: [
+                TextButton(
+                  child: const Text('OK'),
+                  onPressed: () => Navigator.of(context).pop(),
+                )
+              ],
+            ),
+          );
+          return;
+        }
+      }
       await _file.writeAsBytes(response.bodyBytes);
       // await Directory(safeFileName(tr));
       final file = File(
