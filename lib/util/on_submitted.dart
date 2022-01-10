@@ -96,7 +96,6 @@ onSubmitted(String song, BuildContext context) async {
         ? await createHiddenFolder('${directory.path}${path.separator}.tmp')
         : await Directory('${directory.path}${path.separator}.tmp')
             .create(recursive: true);
-    await Directory('${directory.path}${path.separator}.tmp').create();
     if (infos is Track) {
       final response =
           await http.get(Uri.parse(infos.album!.images!.first.url!));
