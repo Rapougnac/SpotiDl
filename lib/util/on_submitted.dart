@@ -36,9 +36,16 @@ onSubmitted(String song, BuildContext context) async {
           content: const Text('Please enable storage permission in settings'),
           actions: [
             TextButton(
+              child: const Text('Settings'),
+              onPressed: () async {
+                await openAppSettings();
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
               child: const Text('OK'),
               onPressed: () => Navigator.of(context).pop(),
-            )
+            ),
           ],
         ),
       );
@@ -50,9 +57,16 @@ onSubmitted(String song, BuildContext context) async {
           content: const Text('Please enable storage permission in settings'),
           actions: [
             TextButton(
+              child: const Text('Settings'),
+              onPressed: () async {
+                await openAppSettings();
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
               child: const Text('OK'),
               onPressed: () => Navigator.of(context).pop(),
-            )
+            ),
           ],
         ),
       );
@@ -111,6 +125,13 @@ onSubmitted(String song, BuildContext context) async {
               content: const Text(
                   'There was an error creating the album cover, please try again, or check your storage permission.\nMake sure to allow writing permission'),
               actions: [
+                TextButton(
+                  child: const Text('Settings'),
+                  onPressed: () async {
+                    await openAppSettings();
+                    Navigator.of(context).pop();
+                  },
+                ),
                 TextButton(
                   child: const Text('OK'),
                   onPressed: () => Navigator.of(context).pop(),
