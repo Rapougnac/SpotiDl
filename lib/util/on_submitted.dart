@@ -62,7 +62,6 @@ onSubmitted(String song, BuildContext context) async {
   }
 
   if (permissionGranted) {
-    // CircularProgressIndicator();
     Stream<List<int>> stream;
     try {
       stream = await toStream(song);
