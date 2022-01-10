@@ -21,6 +21,10 @@ getInfos(String url) async {
           final track = await spotify.tracks.get(id);
           return track;
         }
+      default:
+        {
+          throw NotFound('Song not found');
+        }
     }
   }
 
