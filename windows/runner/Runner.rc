@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "com.Rapou" "\0"
-            VALUE "FileDescription", "spotidl" "\0"
+            VALUE "FileDescription", "Spotify Downloader" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
             VALUE "InternalName", "spotidl" "\0"
-            VALUE "LegalCopyright", "Copyright (C) 2022 com.Rapou. All rights reserved." "\0"
+            VALUE "LegalCopyright", "Copyright (C) 2022 Rapougnac All rights reserved." "\0"
             VALUE "OriginalFilename", "spotidl.exe" "\0"
-            VALUE "ProductName", "spotidl" "\0"
+            VALUE "ProductName", "Spotify Downloader" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
