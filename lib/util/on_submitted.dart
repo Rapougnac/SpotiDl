@@ -1,13 +1,11 @@
 export 'on_submitted.dart';
 
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:spotidl/util/get_music_directory.dart';
 import 'package:spotidl/util/safe_file_name.dart';
 import 'package:spotidl/util/to_stream.dart';
 import 'get_infos.dart';
-import 'is_first_time.dart';
 import 'package:path/path.dart' as path;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:spotify/spotify.dart';
@@ -87,12 +85,11 @@ onSubmitted(String song, BuildContext context) async {
   }
 
   if (permissionGranted) {
-    Directory directory =
-        Directory('${musicDir.path}${path.separator}SpotifyDl');
-    await isFirstTime()
-        ? (await Directory('${musicDir.path}${path.separator}SpotifyDl')
-            .create(recursive: false))
-        : null;
+    final mainDir = Directory('${musicDir.path}${path.separator}SpotifyDl');
+    if (!mainDir.existsSync()) {
+      await mainDir.create(recursive: true);
+    }
+
     Stream<List<int>> stream;
     try {
       stream = await toStream(song);
@@ -138,6 +135,7 @@ onSubmitted(String song, BuildContext context) async {
       );
       return;
     }
+    // TODO: Write APIC/ID3 tags to file, cache cover in the temp folder.
     // final tempDir = Platform.isWindows
     //     ? await createHiddenFolder('${directory.path}${path.separator}.tmp')
     //     : await Directory('${directory.path}${path.separator}.tmp')
@@ -177,12 +175,11 @@ onSubmitted(String song, BuildContext context) async {
       // }
       // await _file.writeAsBytes(response.bodyBytes);
       // await Directory(safeFileName(tr));
-      final a = Directory('/storage/emulated/0/Downloads/');
-      final file =
-          File('${a.path}${path.separator}${safeFileName(infos.name!)}.mp3');
+      final file = File(
+          '${musicDir.path}${path.separator}SpotifyDL${path.separator}${safeFileName(infos.name!)}.mp3');
       if (!file.existsSync()) {
         try {
-          await file.create();
+          file.createSync();
         } on FileSystemException {
           showDialog(
             context: context,
