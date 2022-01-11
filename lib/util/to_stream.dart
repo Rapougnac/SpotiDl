@@ -45,7 +45,7 @@ Future<Stream<List<int>>> toStream(String url) async {
       //       .reduce((a, b) => a.merge(b));
       default:
         {
-          throw NotFound('Song not found');
+          throw UnsupportedError('Unsupported type');
         }
     }
   }

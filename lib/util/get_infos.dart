@@ -23,7 +23,7 @@ getInfos(String url) async {
         }
       default:
         {
-          throw NotFound('Song not found');
+          throw UnsupportedError('Type not supported');
         }
     }
   }

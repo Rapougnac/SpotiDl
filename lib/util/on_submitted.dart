@@ -11,7 +11,6 @@ import 'package:path/path.dart' as path;
 import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:spotify/spotify.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:spotidl/errors/not_found.dart';
 import 'package:spotidl/util/create_hidden_folder_win.dart';
 
@@ -104,6 +103,22 @@ onSubmitted(String song, BuildContext context) async {
           title: const Text('Song Not Found'),
           content: const Text(
               'The song you are looking for is not found, please try again'),
+          actions: [
+            TextButton(
+              child: const Text('OK'),
+              onPressed: () => Navigator.of(context).pop(),
+            )
+          ],
+        ),
+      );
+      return;
+    } on UnsupportedError {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text('Unsupported Song'),
+          content: const Text(
+              'The song you are looking for is not supported, if it\'s a playlist or album, this is currently not supported'),
           actions: [
             TextButton(
               child: const Text('OK'),
