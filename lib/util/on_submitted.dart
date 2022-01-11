@@ -8,11 +8,9 @@ import 'package:spotidl/util/to_stream.dart';
 import 'get_infos.dart';
 import 'is_first_time.dart';
 import 'package:path/path.dart' as path;
-import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:spotify/spotify.dart';
 import 'package:spotidl/errors/not_found.dart';
-import 'package:spotidl/util/create_hidden_folder_win.dart';
 
 onSubmitted(String song, BuildContext context) async {
   final musicDir = getMusicDirectory();
