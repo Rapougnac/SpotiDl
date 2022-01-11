@@ -3,11 +3,11 @@ import 'util/palette.dart';
 import 'widgets/home.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(const SpotifyDownloader());
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class SpotifyDownloader extends StatelessWidget {
+  const SpotifyDownloader({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
