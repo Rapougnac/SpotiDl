@@ -7,6 +7,7 @@ import 'package:spotidl/util/get_infos.dart';
 import 'package:spotidl/util/on_submitted.dart';
 import 'package:spotidl/util/palette.dart';
 import 'package:spotify/spotify.dart' show Track;
+
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -42,34 +43,36 @@ class HomePageBody extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Center(
-          child: SearchBar(),
-        ),
-        const SizedBox(height: 20),
-        Column(
-          children: [
-            Center(
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(25),
-                child: SizedBox(
-                  child: _Util.image,
-                  height: 200,
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Center(
+            child: SearchBar(),
+          ),
+          const SizedBox(height: 20),
+          Column(
+            children: [
+              Center(
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(25),
+                  child: SizedBox(
+                    child: _Util.image,
+                    height: 200,
+                  ),
                 ),
               ),
-            ),
-            Text(
-              _Util.name,
-              style: const TextStyle(
-                fontSize: 20,
-                color: Colors.white,
+              Text(
+                _Util.name,
+                style: const TextStyle(
+                  fontSize: 20,
+                  color: Colors.white,
+                ),
               ),
-            ),
-          ],
-        ),
-      ],
+            ],
+          ),
+        ],
+      ),
     );
   }
 }
