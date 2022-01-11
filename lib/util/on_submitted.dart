@@ -168,6 +168,8 @@ onSubmitted(String song, BuildContext context) async {
       await stream.pipe(fileStream);
       await fileStream.flush();
       await fileStream.close();
+
+      return file;
     }
   }
 }
