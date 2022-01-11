@@ -38,8 +38,17 @@ onSubmitted(String song, BuildContext context) async {
             TextButton(
               child: const Text('Settings'),
               onPressed: () async {
-                await openAppSettings();
-                Navigator.of(context).pop();
+                final res = await openAppSettings();
+                if (res) {
+                  Navigator.of(context).pop();
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Failed to open settings'),
+                    ),
+                  );
+                  return;
+                }
               },
             ),
             TextButton(
@@ -59,8 +68,17 @@ onSubmitted(String song, BuildContext context) async {
             TextButton(
               child: const Text('Settings'),
               onPressed: () async {
-                await openAppSettings();
-                Navigator.of(context).pop();
+                final res = await openAppSettings();
+                if (res) {
+                  Navigator.of(context).pop();
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Failed to open settings'),
+                    ),
+                  );
+                  return;
+                }
               },
             ),
             TextButton(
