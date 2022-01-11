@@ -178,7 +178,7 @@ onSubmitted(String song, BuildContext context) async {
       await _file.writeAsBytes(response.bodyBytes);
       // await Directory(safeFileName(tr));
       final file = File(
-          '${directory.path}${path.separator}${safeFileName(infos.name!)}');
+          '${directory.path}${path.separator}${safeFileName(infos.name!)}.mp3');
       final fileStream = file.openWrite();
       await stream.pipe(fileStream);
       await fileStream.flush();
