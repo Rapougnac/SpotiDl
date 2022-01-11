@@ -1,11 +1,12 @@
 export 'home_page.dart';
 
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:spotidl/util/get_infos.dart';
 import 'package:spotidl/util/on_submitted.dart';
 import 'package:spotidl/util/palette.dart';
 import 'package:spotify/spotify.dart' show Track;
-
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
 
@@ -44,10 +45,30 @@ class HomePageBody extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        if (SearchBar.of(context)?.thumbnail != null)
-          SearchBar.of(context)!.thumbnail!,
-        const SearchBar(),
+        const Center(
+          child: SearchBar(),
+        ),
         const SizedBox(height: 20),
+        Column(
+          children: [
+            Center(
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(25),
+                child: SizedBox(
+                  child: _Util.image,
+                  height: 200,
+                ),
+              ),
+            ),
+            Text(
+              _Util.name,
+              style: const TextStyle(
+                fontSize: 20,
+                color: Colors.white,
+              ),
+            ),
+          ],
+        ),
       ],
     );
   }
@@ -59,15 +80,12 @@ class SearchBar extends StatefulWidget {
   @override
   _SearchBarState createState() => _SearchBarState();
 
-  Image? getThumbnail() => _SearchBarState().thumbnail;
-
   static _SearchBarState? of(BuildContext context) =>
       context.findAncestorStateOfType<_SearchBarState>();
 }
 
 class _SearchBarState extends State<SearchBar> {
   bool loading = false;
-  Image? thumbnail;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -92,15 +110,30 @@ class _SearchBarState extends State<SearchBar> {
                       _handleProgress(s);
                       final infos = await getInfos(s);
                       if (infos != null) {
-                        handleInfos((infos as Track).album!.images!.first.url!);
+                        _Util.image = Image.network(
+                            (infos as Track).album!.images!.first.url!);
+                        _Util.name = infos.name ?? '';
                       }
-                      await onSubmitted(s, context);
+                      rebuildAllParents(context);
+                      final res = await onSubmitted(s, context);
+                      if (res is File) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Downloaded to ${res.path}'),
+                          ),
+                        );
+                      }
                       _stopProgress();
                     },
                     decoration: const InputDecoration(
                       border: InputBorder.none,
                       hintText: 'Search for a song',
+                      icon: Icon(
+                        Icons.search,
+                        color: Colors.grey,
+                      ),
                     ),
+                    enableSuggestions: false,
                   ),
                 ),
                 if (loading)
@@ -115,7 +148,6 @@ class _SearchBarState extends State<SearchBar> {
                   ),
               ],
             ),
-            if (thumbnail != null) thumbnail!
           ],
         ),
       ),
@@ -133,10 +165,16 @@ class _SearchBarState extends State<SearchBar> {
       () => loading = false,
     );
   }
+}
 
-  void handleInfos(String img) {
-    setState(
-      () => thumbnail = Image.network(img),
-    );
-  }
+class _Util {
+  static Image? image;
+  static String name = '';
+}
+
+void rebuildAllParents(BuildContext context) {
+  context.visitAncestorElements((element) {
+    element.markNeedsBuild();
+    return true;
+  });
 }
