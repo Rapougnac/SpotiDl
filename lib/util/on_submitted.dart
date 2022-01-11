@@ -1,6 +1,7 @@
 export 'on_submitted.dart';
 
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'dart:io';
 import 'package:spotidl/util/get_music_directory.dart';
 import 'package:spotidl/util/safe_file_name.dart';
@@ -14,11 +15,6 @@ import 'package:spotidl/errors/not_found.dart';
 
 onSubmitted(String song, BuildContext context) async {
   final musicDir = getMusicDirectory();
-  Directory directory = Directory('${musicDir.path}${path.separator}SpotifyDl');
-  await isFirstTime()
-      ? (await Directory('${musicDir.path}${path.separator}SpotifyDl')
-          .create(recursive: false))
-      : null;
   if (song.isEmpty) return;
 
   bool permissionGranted = false;
@@ -91,6 +87,12 @@ onSubmitted(String song, BuildContext context) async {
   }
 
   if (permissionGranted) {
+    Directory directory =
+        Directory('${musicDir.path}${path.separator}SpotifyDl');
+    await isFirstTime()
+        ? (await Directory('${musicDir.path}${path.separator}SpotifyDl')
+            .create(recursive: false))
+        : null;
     Stream<List<int>> stream;
     try {
       stream = await toStream(song);
@@ -175,8 +177,37 @@ onSubmitted(String song, BuildContext context) async {
       // }
       // await _file.writeAsBytes(response.bodyBytes);
       // await Directory(safeFileName(tr));
-      final file = File(
-          '${directory.path}${path.separator}${safeFileName(infos.name!)}.mp3');
+      final a = Directory('/storage/emulated/0/Downloads/');
+      final file =
+          File('${a.path}${path.separator}${safeFileName(infos.name!)}.mp3');
+      if (!file.existsSync()) {
+        try {
+          await file.create();
+        } on FileSystemException {
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Error'),
+              content: const Text(
+                  'There was an error creating the file, please try again, or check your storage permission.\nMake sure to allow writing permission, or, have-you enough free space?'),
+              actions: [
+                TextButton(
+                  child: const Text('Settings'),
+                  onPressed: () async {
+                    await openAppSettings();
+                    Navigator.of(context).pop();
+                  },
+                ),
+                TextButton(
+                  child: const Text('OK'),
+                  onPressed: () => Navigator.of(context).pop(),
+                )
+              ],
+            ),
+          );
+          return;
+        }
+      }
       final fileStream = file.openWrite();
       await stream.pipe(fileStream);
       await fileStream.flush();
