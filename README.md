@@ -1,12 +1,16 @@
-# spotidl - A Spotify Downloader (As if there weren't enough of them [<img src="https://cdn.discordapp.com/emojis/834119948170821652.png?size=512" height="45" />](https://bit.ly/31BnJAp))
+# Note:
+Due to my work, I have to slow down the commits I make on this repository. I prefer to concentrate on what is essential for me.
+I'll be back soon. 
+
+### spotidl - A Spotify Downloader (As if there weren't enough of them [<img src="https://cdn.discordapp.com/emojis/834119948170821652.png?size=512" height="45" />](https://bit.ly/31BnJAp))
 
 Lemme just a moment (like 2-3 years).. to create this magnificent project
 
-## Targets
+#### Targets
 For now, I'll focus on building a mobile app, but if I have the time, I'll make this repository compatible with desktop. (Maybe web, but idk.).
 
 
-## Why this project ? 
+#### Why this project ? 
 Yeah, this is a good question- 
 There's already a bunch of apps that downloads music from youtube.
 
