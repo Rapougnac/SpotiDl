@@ -2,6 +2,8 @@ export 'on_submitted.dart';
 
 // ignore: import_of_legacy_library_into_null_safe
 import 'package:dart_tags/dart_tags.dart';
+import 'package:ffmpeg_kit_flutter_audio/ffmpeg_kit.dart';
+import 'package:ffmpeg_kit_flutter_audio/return_code.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:spotidl/util/get_music_directory.dart';
@@ -90,7 +92,7 @@ onSubmitted(String song, BuildContext context) async {
   }
 
   if (permissionGranted) {
-    final mainDir = Directory('${musicDir.path}${path.separator}SpotifyDl');
+    final mainDir = Directory('${musicDir.path}${path.separator}SpotifDl');
     if (!mainDir.existsSync()) {
       await mainDir.create(recursive: true);
     }
@@ -183,7 +185,7 @@ onSubmitted(String song, BuildContext context) async {
       }
       await _file.writeAsBytes(response.bodyBytes);
       final file = File(
-          '${musicDir.path}${path.separator}SpotifyDL${path.separator}${safeFileName(infos.name!)}.mp3');
+          '${musicDir.path}${path.separator}SpotifDL${path.separator}${safeFileName(infos.name!)}_.mp3');
       if (!file.existsSync()) {
         try {
           file.createSync();
@@ -216,28 +218,42 @@ onSubmitted(String song, BuildContext context) async {
       await stream.pipe(fileStream);
       await fileStream.flush();
       await fileStream.close();
-      final pic = AttachedPicture('image/jpeg', 0x03, path.basename(_file.path),
-          _file.readAsBytesSync());
-      Tag tags = Tag();
-      try {
-        tags = Tag()
-          ..tags = {
-            'title': infos.name,
-            'artist': infos.artists?.map((e) => e.name).join('; '),
-            'album': infos.album?.name,
-            'track': infos.trackNumber,
-            'disc': infos.discNumber,
-            'picture': {pic.key: pic},
-          }
-          ..type = 'ID3'
-          ..version = '2.4';
-      } catch (e) {
-        print(e);
+      final a = await FFmpegKit.execute(
+          '-i "${file.path}" -c:a libmp3lame -qscale:a 2 "${file.path.substring(0, file.path.length - 5)}.mp3"');
+      final returnCode = await a.getReturnCode();
+
+      // TODO: Remove this
+      final logs = await a.getLogs();
+      for (var log in logs) {
+        print(log.getMessage());
       }
+      if (ReturnCode.isSuccess(returnCode)) {
+        final pic = AttachedPicture('image/jpeg', 0x03,
+            path.basename(_file.path), _file.readAsBytesSync());
+        final encodedFile =
+            File('${file.path.substring(0, file.path.length - 5)}.mp3');
+        Tag tags = Tag();
+        try {
+          tags = Tag()
+            ..tags = {
+              'title': infos.name,
+              'artist': infos.artists?.map((e) => e.name).join('; '),
+              'album': infos.album?.name,
+              'track': infos.trackNumber,
+              'disc': infos.discNumber,
+              'picture': pic,
+              'explicit': infos.explicit,
+            }
+            ..type = 'ID3'
+            ..version = '2.4';
+        } catch (e) {
+          print(e);
+        }
+        final tagged = await writeTags(tags, encodedFile.path);
+        File(encodedFile.path).writeAsBytesSync(tagged, mode: FileMode.write);
 
-      writeTags(tags, file.path);
-
-      return file;
+        return encodedFile;
+      }
     }
   }
 }
