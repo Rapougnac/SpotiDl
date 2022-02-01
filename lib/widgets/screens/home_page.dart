@@ -114,7 +114,8 @@ class _SearchBarState extends State<SearchBar> {
                       final infos = await getInfos(s);
                       if (infos != null) {
                         _Util.image = Image.network(
-                            (infos as Track).album!.images!.first.url!);
+                          (infos as Track).album?.images?.first.url ?? '',
+                        );
                         _Util.name = infos.name ?? '';
                       }
                       rebuildAllParents(context);
@@ -144,6 +145,7 @@ class _SearchBarState extends State<SearchBar> {
                     width: 20,
                     height: 20,
                     child: CircularProgressIndicator(
+                      key: Key('progress'),
                       backgroundColor: Colors.blue,
                       strokeWidth: 2,
                       valueColor: AlwaysStoppedAnimation(Colors.white),
