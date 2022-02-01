@@ -13,7 +13,7 @@ import 'package:spotidl/util/safe_file_name.dart';
 import 'package:spotidl/util/to_stream.dart';
 import 'package:spotidl/util/write_tags.dart';
 import 'create_hidden_folder_win.dart';
-import 'get_infos.dart';
+import 'package:spotidl/util/get_infos.dart';
 import 'package:path/path.dart' as path;
 import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
@@ -232,6 +232,7 @@ onSubmitted(String song, BuildContext context) async {
       if (ReturnCode.isSuccess(returnCode)) {
         final pic = AttachedPicture('image/jpeg', 0x03,
             path.basename(_file.path), _file.readAsBytesSync());
+        
         final encodedFile =
             File('${file.path.substring(0, file.path.length - 5)}.mp3');
         Tag tags = Tag();
@@ -241,11 +242,13 @@ onSubmitted(String song, BuildContext context) async {
             ..tags = {
               'title': infos.name,
               'artist': infos.artists?.map((e) => e.name).join('; '),
-              'album': infos.album?.name,
+              'album': infos.album?.name ?? '',
               'track': infos.trackNumber.toString(),
               'disc': infos.discNumber.toString(),
               'picture': pic,
               'explicit': infos.explicit.toString(),
+              'date': infos.album?.releaseDate ?? '',
+              
             }
             ..type = 'ID3'
             ..version = '2.4';
