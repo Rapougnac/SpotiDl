@@ -144,48 +144,15 @@ onSubmitted(String song, BuildContext context) async {
       );
       return;
     }
-    final directory = getMusicDirectory();
-    final tempDir = Platform.isWindows
-        ? await createHiddenFolder(
-            '${directory.path}${path.separator}SpotiDL${path.separator}.tmp')
-        : await Directory(
-                '${directory.path}${path.separator}SpotiDL${path.separator}.tmp')
-            .create(recursive: true);
+    // final tempDir = Platform.isWindows
+    //     ? await createHiddenFolder(
+    //         '${directory.path}${path.separator}SpotiDL${path.separator}.tmp')
+    //     : await Directory(
+    //             '${directory.path}${path.separator}SpotiDL${path.separator}.tmp')
+    // .create(recursive: true);
     if (infos is Track) {
       final response =
           await http.get(Uri.parse(infos.album!.images!.first.url!));
-
-      final _file = File(
-          '${tempDir.path}${path.separator}${safeFileName(infos.name!)}.jpg');
-      if (!_file.existsSync()) {
-        try {
-          await _file.create();
-        } on FileSystemException {
-          showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: const Text('Error'),
-              content: const Text(
-                  'There was an error creating the album cover, please try again, or check your storage permission.\nMake sure to allow writing permission'),
-              actions: [
-                TextButton(
-                  child: const Text('Settings'),
-                  onPressed: () async {
-                    await openAppSettings();
-                    Navigator.of(context).pop();
-                  },
-                ),
-                TextButton(
-                  child: const Text('OK'),
-                  onPressed: () => Navigator.of(context).pop(),
-                )
-              ],
-            ),
-          );
-          return;
-        }
-      }
-      await _file.writeAsBytes(response.bodyBytes);
       final file = File(
           '${musicDir.path}${path.separator}SpotiDL${path.separator}${safeFileName(infos.name!)}_.mp3');
       if (!file.existsSync()) {
@@ -230,9 +197,9 @@ onSubmitted(String song, BuildContext context) async {
         print(log.getMessage());
       }
       if (ReturnCode.isSuccess(returnCode)) {
-        final pic = AttachedPicture('image/jpeg', 0x03,
-            path.basename(_file.path), _file.readAsBytesSync());
-        
+        final pic = AttachedPicture(
+            'image/jpeg', 0x03, '${infos.name}', response.bodyBytes);
+
         final encodedFile =
             File('${file.path.substring(0, file.path.length - 5)}.mp3');
         Tag tags = Tag();
@@ -248,12 +215,23 @@ onSubmitted(String song, BuildContext context) async {
               'picture': pic,
               'explicit': infos.explicit.toString(),
               'date': infos.album?.releaseDate ?? '',
-              
             }
             ..type = 'ID3'
             ..version = '2.4';
         } catch (e) {
-          print(e);
+          showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: const Text('Error'),
+              content: const Text('There was an error creating the tags'),
+              actions: [
+                TextButton(
+                  child: const Text('OK'),
+                  onPressed: () => Navigator.of(context).pop(),
+                )
+              ],
+            ),
+          );
         }
         // _file.deleteSync();
         final tagged = await writeTags(tags, encodedFile.path);
