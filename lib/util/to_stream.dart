@@ -24,7 +24,7 @@ Future<Stream<List<int>>> toStream(String url) async {
           final track = await spotify.tracks.get(id);
           final _url = Uri.parse(
               'https://youtube.com/results?q=${Uri.encodeComponent('${track.name} - ${track.artists?[0].name}').replaceAll('%20', '+')}&hl=en&sp=EgIQAQ%253D%253D');
-          final stream = await _toStream(_url);
+          final stream = await _toStream(_url, track);
           return stream;
         }
       // case 'playlist':
@@ -52,8 +52,12 @@ Future<Stream<List<int>>> toStream(String url) async {
   throw NotFound('Song not found');
 }
 
-Future<Stream<List<int>>> _toStream(Uri url) async {
-  final h = await http.get(url);
+Future<Stream<List<int>>> _toStream(Uri url, Track infos) async {
+  print(infos);
+  final h = await http.get(url, headers: {
+    'User-Agent':
+        'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/83.0.4103.116 Safari/537.36'
+  });
   var html = h.body;
   var details = [];
   var fetched = false;
