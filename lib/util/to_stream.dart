@@ -16,9 +16,8 @@ Future<Stream<List<int>>> toStream(String url) async {
   if (reg.hasMatch(url)) {
     final matches = reg.allMatches(url);
     final match = matches.elementAt(0);
-    final id = match.group(3);
-    final type = match.group(1);
-    if (type == null || id == null) {}
+    final id = match.group(3)!;
+    final type = match.group(1)!;
     switch (type) {
       case 'track':
         {
