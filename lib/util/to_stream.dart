@@ -93,7 +93,26 @@ Future<Stream<List<int>>> _toStream(Uri url, Track infos) async {
       // ignore: empty_catches
     } catch (e) {}
   }
-  final videoId = details[0]['videoRenderer']['videoId'];
+  // Remove the milliseconds in the duration, we don't need it. Result: 00:00
+  final durationWithoutMilliseconds = infos.duration
+      .toString()
+      .split(':')
+      .sublist(1)
+      .join(':')
+      .split('.')
+      .first;
+  // Parse the duration to get only the minutes and seconds, result: 0:0
+  final durationFromInfos = durationWithoutMilliseconds
+      .substring(0, durationWithoutMilliseconds.length - 1)
+      .substring(1);
+
+  // Find the first video in the list that approximately matches the duration
+  final parsedDetails = details.firstWhere((d) =>
+      d['videoRenderer']['lengthText']['simpleText'].substring(
+          0, d['videoRenderer']['lengthText']['simpleText'].length - 1) ==
+      durationFromInfos);
+  // Get the video id
+  final videoId = parsedDetails['videoRenderer']?['videoId'];
   final yt = YoutubeExplode();
   final manifest = await yt.videos.streamsClient.getManifest(videoId);
   final streamInfo = manifest.audioOnly.withHighestBitrate();
