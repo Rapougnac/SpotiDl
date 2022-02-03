@@ -21,7 +21,7 @@ Future<Stream<List<int>>> toStream(String url) async {
     switch (type) {
       case 'track':
         {
-          final track = await spotify.tracks.get(id!);
+          final track = await spotify.tracks.get(id);
           final _url = Uri.parse(
               'https://youtube.com/results?q=${Uri.encodeComponent('${track.name} - ${track.artists?[0].name}').replaceAll('%20', '+')}&hl=en&sp=EgIQAQ%253D%253D');
           final stream = await _toStream(_url);
