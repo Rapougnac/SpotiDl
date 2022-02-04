@@ -3,6 +3,7 @@ export 'to_stream.dart';
 import 'dart:convert';
 import 'package:spotidl/errors/not_found.dart';
 import 'package:http/http.dart' as http;
+import 'package:spotidl/models/video_renderer.dart';
 import 'package:spotify/spotify.dart';
 import 'package:spotidl/crendentials.dart' as creds;
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
@@ -93,6 +94,7 @@ Future<Stream<List<int>>> _toStream(Uri url, Track infos) async {
       // ignore: empty_catches
     } catch (e) {}
   }
+  var parsed = details.map((d) => VideoRenderer.fromJson(d)).toList();
   // Remove the milliseconds in the duration, we don't need it. Result: 00:00
   final durationWithoutMilliseconds = infos.duration
       .toString()
@@ -105,14 +107,11 @@ Future<Stream<List<int>>> _toStream(Uri url, Track infos) async {
   final durationFromInfos = durationWithoutMilliseconds
       .substring(0, durationWithoutMilliseconds.length - 1)
       .substring(1);
-
   // Find the first video in the list that approximately matches the duration
-  final parsedDetails = details.firstWhere((d) =>
-      d['videoRenderer']['lengthText']['simpleText'].substring(
-          0, d['videoRenderer']['lengthText']['simpleText'].length - 1) ==
-      durationFromInfos);
+  final parsedDetails = parsed.firstWhere((d) =>
+      d.duration.substring(0, d.duration.length - 1) == durationFromInfos);
   // Get the video id
-  final videoId = parsedDetails['videoRenderer']?['videoId'];
+  final videoId = parsedDetails.videoId;
   final yt = YoutubeExplode();
   final manifest = await yt.videos.streamsClient.getManifest(videoId);
   final streamInfo = manifest.audioOnly.withHighestBitrate();
