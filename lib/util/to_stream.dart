@@ -109,7 +109,7 @@ Future<Stream<List<int>>> _toStream(Uri url, Track infos) async {
       .substring(1);
   // Find the first video in the list that approximately matches the duration
   final parsedDetails = parsed.firstWhere((d) =>
-      d.duration.substring(0, d.duration.length - 1) == durationFromInfos);
+      d.duration.substring(0, d.duration.length - 1) == durationFromInfos, orElse: () => parsed[0]);
   // Get the video id
   final videoId = parsedDetails.videoId;
   final yt = YoutubeExplode();
