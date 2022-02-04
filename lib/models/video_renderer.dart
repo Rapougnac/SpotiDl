@@ -10,7 +10,7 @@ class VideoRenderer {
   late String viewCount;
   VideoRenderer.fromJson(dynamic data) {
     videoId = data['videoRenderer']['videoId'];
-    // thumbnail = data['videoRenderer']['thumbnail']['thumbnails'][0]['url'];
+    thumbnail = data['videoRenderer']['thumbnail']['thumbnails'][0]['url'];
     title = data['videoRenderer']['title']['runs'][0]['text'];
     artist = data['videoRenderer']['longBylineText']['runs'][0]['text'];
     publishedAt = data['videoRenderer']?['publishedTimeText']?['simpleText'] ?? '0';
