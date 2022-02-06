@@ -3,6 +3,7 @@ export 'to_stream.dart';
 import 'dart:convert';
 import 'package:spotidl/errors/not_found.dart';
 import 'package:http/http.dart' as http;
+import 'package:spotidl/models/sponsor_block.dart';
 import 'package:spotidl/models/video_renderer.dart';
 import 'package:spotify/spotify.dart';
 import 'package:spotidl/crendentials.dart' as creds;
@@ -95,6 +96,23 @@ Future<Stream<List<int>>> _toStream(Uri url, Track infos) async {
     } catch (e) {}
   }
   var parsed = details.map((d) => VideoRenderer.fromJson(d)).toList();
+  final firstVid = parsed[0x00];
+  final hash = toSha256(firstVid.videoId).substring(0, 4);
+  final apiUrl =
+      'https://sponsor.ajay.app/api/skipSegments/$hash?categories=["sponsor","poi_highlight","music_offtopic","preview","outro","intro","interaction","selfpromo","exclusive_access"]&actionTypes=["skip","mute","full"]&userAgent=sponsorBlocker@ajay.app';
+  final res = await http.get(Uri.parse(apiUrl));
+  final json = jsonDecode(res.body);
+  // Re type with nullable, because otherwise it's not possible to use the `orElse()` method in the `firstWhere()` method
+  final parsedJson =
+      (json as List).map((j) => SponsonrBlock.fromJson(j)).toList();
+  SponsonrBlock? firstVidWithoutSponsor;
+  // `orElse` clause is causing a type issue
+  try {
+    firstVidWithoutSponsor =
+        parsedJson.firstWhere((j) => j.videoID == firstVid.videoId);
+  } on StateError {
+    firstVidWithoutSponsor = null;
+  }
   // Remove the milliseconds in the duration, we don't need it. Result: 00:00
   final durationWithoutMilliseconds = infos.duration
       .toString()
@@ -104,18 +122,60 @@ Future<Stream<List<int>>> _toStream(Uri url, Track infos) async {
       .split('.')
       .first;
   // Parse the duration to get only the minutes and seconds, result: 0:0
-  final durationFromInfos = durationWithoutMilliseconds
-      .substring(0, durationWithoutMilliseconds.length - 1)
-      .substring(1);
-  // Find the first video in the list that approximately matches the duration
-  final parsedDetails = parsed.firstWhere((d) =>
-      d.duration.substring(0, d.duration.length - 1) == durationFromInfos, orElse: () => parsed[0]);
-  // Get the video id
-  final videoId = parsedDetails.videoId;
-  final yt = YoutubeExplode();
-  final manifest = await yt.videos.streamsClient.getManifest(videoId);
-  final streamInfo = manifest.audioOnly.withHighestBitrate();
-  final stream = yt.videos.streamsClient.get(streamInfo);
+  final durationFromInfos = durationWithoutMilliseconds.substring(
+      1, durationWithoutMilliseconds.length - 1);
+  final parsedDuration = parsed.firstWhere((el) =>
+      el.duration.substring(0, el.duration.length - 1) == durationFromInfos);
+  // If no sponsor is found, return the original stream
+  if (firstVidWithoutSponsor == null) {
+    // Find the first video in the list that approximately matches the duration
+    final parsedDetails = parsed.firstWhere(
+        (d) =>
+            d.duration.substring(0, d.duration.length - 1) == durationFromInfos,
+        orElse: () => parsed[0]);
+
+    final videoId = parsedDetails.videoId;
+    final yt = YoutubeExplode();
+    final manifest = await yt.videos.streamsClient.getManifest(videoId);
+    final streamInfo = manifest.audioOnly.withHighestBitrate();
+    final stream = yt.videos.streamsClient.get(streamInfo);
+    return stream;
+  } else {
+    final cachedDurations = <int>[];
+    // final overlappedDurations = <int>[];
+    for (int i = 0; i < firstVidWithoutSponsor.segments.length; i++) {
+      var segment = firstVidWithoutSponsor.segments[i].segment;
+      // TODO: Implements the substraction of overlapped segments
+      if (checkIfSegmentsOverlap(firstVidWithoutSponsor.segments)) {}
+      final elapsedTime = (segment[1] - segment[0]).floor();
+      cachedDurations.add(elapsedTime);
+    }
+    var videoDuration = firstVid.duration;
+    final summedDurations = cachedDurations.reduce((a, b) => a + b);
+    final trueDurationOfVideo = convertSecondsToStringTime(
+      convertStringTimeToSeconds(videoDuration) - summedDurations,
+    );
+    final approximativeDuration =
+        trueDurationOfVideo.substring(1, trueDurationOfVideo.length - 1);
+    if (approximativeDuration == durationFromInfos) {
+      final videoId = firstVidWithoutSponsor.videoID;
+      final yt = YoutubeExplode();
+      final manifest = await yt.videos.streamsClient.getManifest(videoId);
+      final streamInfo = manifest.audioOnly.withHighestBitrate();
+      final stream = yt.videos.streamsClient.get(streamInfo);
+
+      return stream;
+    } else {
+      final videoId = firstVid.videoId;
+      final yt = YoutubeExplode();
+      final manifest = await yt.videos.streamsClient.getManifest(videoId);
+      final streamInfo = manifest.audioOnly.withHighestBitrate();
+      final stream = yt.videos.streamsClient.get(streamInfo);
+      return stream;
+    }
+  }
+}
+
 /// Converts a string to a SHA256 hashed string
 /// ```dart
 /// toSha256('hello world');
@@ -127,6 +187,35 @@ String toSha256(String s) {
   return digest.toString();
 }
 
+/// Converts a time string to seconds
+/// ```dart
+/// convertStringTimeToSeconds('01:15');
+///  // => 75
+/// ```
+int convertStringTimeToSeconds(String time) {
+  final timeSplit = time.split(':');
+  final seconds = int.parse(timeSplit[0]) * 60 + int.parse(timeSplit[1]);
+  return seconds;
+}
 
-  return stream;
+/// Converts seconds to a time string
+/// ```dart
+/// convertSecondsToStringTime(75);
+/// // => '01:15'
+/// ```
+String convertSecondsToStringTime(int seconds) {
+  final minutes = (seconds / 60).floor();
+  final secondsLeft = seconds % 60;
+  return '${minutes.toString().padLeft(2, '0')}:${secondsLeft.toString().padLeft(2, '0')}';
+}
+
+bool checkIfSegmentsOverlap(List<Segment> segments) {
+  for (int i = 0; i < segments.length - 1; i++) {
+    for (int j = i + 1; j < segments.length; j++) {
+      if (segments[i].segment.last > segments[j].segment.first) {
+        return true;
+      }
+    }
+  }
+  return false;
 }
