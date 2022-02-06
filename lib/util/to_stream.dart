@@ -7,6 +7,7 @@ import 'package:spotidl/models/video_renderer.dart';
 import 'package:spotify/spotify.dart';
 import 'package:spotidl/crendentials.dart' as creds;
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
+import 'package:crypto/crypto.dart';
 
 Future<Stream<List<int>>> toStream(String url) async {
   final credentials = SpotifyApiCredentials(
