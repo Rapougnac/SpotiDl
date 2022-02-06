@@ -1,8 +1,5 @@
 export 'on_submitted.dart';
 
-// ignore: import_of_legacy_library_into_null_safe
-import 'dart:math';
-
 import 'package:dart_tags/dart_tags.dart';
 import 'package:ffmpeg_kit_flutter_audio/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter_audio/return_code.dart';
@@ -12,7 +9,6 @@ import 'package:spotidl/util/get_music_directory.dart';
 import 'package:spotidl/util/safe_file_name.dart';
 import 'package:spotidl/util/to_stream.dart';
 import 'package:spotidl/util/write_tags.dart';
-import 'create_hidden_folder_win.dart';
 import 'package:spotidl/util/get_infos.dart';
 import 'package:path/path.dart' as path;
 import 'package:http/http.dart' as http;
