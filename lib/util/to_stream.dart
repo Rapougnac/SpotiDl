@@ -115,6 +115,17 @@ Future<Stream<List<int>>> _toStream(Uri url, Track infos) async {
   final manifest = await yt.videos.streamsClient.getManifest(videoId);
   final streamInfo = manifest.audioOnly.withHighestBitrate();
   final stream = yt.videos.streamsClient.get(streamInfo);
+/// Converts a string to a SHA256 hashed string
+/// ```dart
+/// toSha256('hello world');
+///   // => 'b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9'
+/// ```
+String toSha256(String s) {
+  final bytes = utf8.encode(s);
+  final digest = sha256.convert(bytes);
+  return digest.toString();
+}
+
 
   return stream;
 }
