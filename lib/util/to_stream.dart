@@ -143,15 +143,18 @@ Future<Stream<List<int>>> _toStream(Uri url, Track infos) async {
   } else {
     final cachedDurations = <int>[];
     // final overlappedDurations = <int>[];
+    int overlapped = 0;
+    if (checkIfSegmentsOverlap(firstVidWithoutSponsor.segments)) {
+      overlapped += overlappedDuration(firstVidWithoutSponsor.segments).floor();
+    }
     for (int i = 0; i < firstVidWithoutSponsor.segments.length; i++) {
       var segment = firstVidWithoutSponsor.segments[i].segment;
-      // TODO: Implements the substraction of overlapped segments
-      if (checkIfSegmentsOverlap(firstVidWithoutSponsor.segments)) {}
-      final elapsedTime = (segment[1] - segment[0]).floor();
+      var elapsedTime = (segment[1] - segment[0]).floor();
       cachedDurations.add(elapsedTime);
     }
     var videoDuration = firstVid.duration;
-    final summedDurations = cachedDurations.reduce((a, b) => a + b);
+    final summedDurations =
+        cachedDurations.reduce((a, b) => a + b) - overlapped;
     final trueDurationOfVideo = convertSecondsToStringTime(
       convertStringTimeToSeconds(videoDuration) - summedDurations,
     );
@@ -218,4 +221,14 @@ bool checkIfSegmentsOverlap(List<Segment> segments) {
     }
   }
   return false;
+}
+
+/// Calculates the duration of the segments without the overlap
+double overlappedDuration(List<Segment> segments) {
+  double durationWithoutOverlap = 0;
+  for (int i = 0; i < segments.length - 1; i++) {
+    durationWithoutOverlap +=
+        segments[i].segment.last - segments[i].segment.first;
+  }
+  return durationWithoutOverlap;
 }
