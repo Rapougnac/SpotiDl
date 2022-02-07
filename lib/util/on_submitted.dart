@@ -229,7 +229,6 @@ onSubmitted(String song, BuildContext context) async {
             ),
           );
         }
-        // _file.deleteSync();
         final tagged = await writeTags(tags, encodedFile.path);
         File(encodedFile.path).writeAsBytesSync(tagged, mode: FileMode.write);
 
