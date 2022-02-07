@@ -194,8 +194,9 @@ onSubmitted(String song, BuildContext context) async {
           response.bodyBytes,
         );
 
-        final encodedFile =
-            File('${file.path.substring(0, file.path.length - 5)}.mp3');
+        final encodedFile = File(
+          '${file.path.substring(0, file.path.length - 5)}.mp3',
+        );
         Tag tags = Tag();
         file.deleteSync();
         try {
