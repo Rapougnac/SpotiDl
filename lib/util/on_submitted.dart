@@ -186,12 +186,6 @@ onSubmitted(String song, BuildContext context) async {
       final a = await FFmpegKit.execute(
           '-i "${file.path}" -c:a libmp3lame -qscale:a 2 -y "${file.path.substring(0, file.path.length - 5)}.mp3"');
       final returnCode = await a.getReturnCode();
-
-      // TODO: Remove this
-      final logs = await a.getLogs();
-      for (var log in logs) {
-        print(log.getMessage());
-      }
       if (ReturnCode.isSuccess(returnCode)) {
         final pic = AttachedPicture(
             'image/jpeg', 0x03, '${infos.name}', response.bodyBytes);
