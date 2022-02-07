@@ -104,8 +104,8 @@ Future<Stream<List<int>>> _toStream(Uri url, Track infos) async {
   final json = jsonDecode(res.body);
   // Re type with nullable, because otherwise it's not possible to use the `orElse()` method in the `firstWhere()` method
   final parsedJson =
-      (json as List).map((j) => SponsonrBlock.fromJson(j)).toList();
-  SponsonrBlock? firstVidWithoutSponsor;
+      (json as List).map((j) => SponsorBlock.fromJson(j)).toList();
+  SponsorBlock? firstVidWithoutSponsor;
   // `orElse` clause is causing a type issue
   try {
     firstVidWithoutSponsor =

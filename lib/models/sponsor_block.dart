@@ -1,6 +1,7 @@
+export 'sponsor_block.dart';
 
 /// Class to convert json response from sposor api to object
-class SponsonrBlock {
+class SponsorBlock {
   /// The video id
   late final String videoID;
 
@@ -10,7 +11,7 @@ class SponsonrBlock {
   /// The video's segments
   late final List<Segment> segments;
 
-  SponsonrBlock.fromJson(Map<String, dynamic> json) {
+  SponsorBlock.fromJson(Map<String, dynamic> json) {
     videoID = json['videoID'];
     hash = json['hash'];
     segments = (json['segments'] as List)
