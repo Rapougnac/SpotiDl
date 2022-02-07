@@ -145,7 +145,7 @@ Future<Stream<List<int>>> _toStream(Uri url, Track infos) async {
     // final overlappedDurations = <int>[];
     int overlapped = 0;
     if (checkIfSegmentsOverlap(firstVidWithoutSponsor.segments)) {
-      overlapped += overlappedDuration(firstVidWithoutSponsor.segments).floor();
+      overlapped = overlappedDuration(firstVidWithoutSponsor.segments).floor();
     }
     for (int i = 0; i < firstVidWithoutSponsor.segments.length; i++) {
       var segment = firstVidWithoutSponsor.segments[i].segment;
