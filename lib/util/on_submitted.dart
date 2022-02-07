@@ -140,12 +140,6 @@ onSubmitted(String song, BuildContext context) async {
       );
       return;
     }
-    // final tempDir = Platform.isWindows
-    //     ? await createHiddenFolder(
-    //         '${directory.path}${path.separator}SpotiDL${path.separator}.tmp')
-    //     : await Directory(
-    //             '${directory.path}${path.separator}SpotiDL${path.separator}.tmp')
-    // .create(recursive: true);
     if (infos is Track) {
       final response =
           await http.get(Uri.parse(infos.album!.images!.first.url!));
