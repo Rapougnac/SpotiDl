@@ -188,7 +188,11 @@ onSubmitted(String song, BuildContext context) async {
       final returnCode = await a.getReturnCode();
       if (ReturnCode.isSuccess(returnCode)) {
         final pic = AttachedPicture(
-            'image/jpeg', 0x03, '${infos.name}', response.bodyBytes);
+          'image/jpeg',
+          0x03,
+          '${infos.name}',
+          response.bodyBytes,
+        );
 
         final encodedFile =
             File('${file.path.substring(0, file.path.length - 5)}.mp3');
