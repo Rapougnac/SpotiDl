@@ -169,7 +169,7 @@ Future<Stream<List<int>>> _toStream(Uri url, Track infos) async {
 
       return stream;
     } else {
-      final videoId = firstVid.videoId;
+      final videoId = parsedDuration.videoId;
       final yt = YoutubeExplode();
       final manifest = await yt.videos.streamsClient.getManifest(videoId);
       final streamInfo = manifest.audioOnly.withHighestBitrate();
