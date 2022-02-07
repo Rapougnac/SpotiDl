@@ -177,10 +177,10 @@ onSubmitted(String song, BuildContext context) async {
       await stream.pipe(fileStream);
       await fileStream.flush();
       await fileStream.close();
-      final a = await FFmpegKit.execute(
+      final ffmpegResult = await FFmpegKit.execute(
         '-i "${file.path}" -c:a libmp3lame -qscale:a 2 -y "${file.path.substring(0, file.path.length - 5)}.mp3"',
       );
-      final returnCode = await a.getReturnCode();
+      final returnCode = await ffmpegResult.getReturnCode();
       if (ReturnCode.isSuccess(returnCode)) {
         final pic = AttachedPicture(
           'image/jpeg',
