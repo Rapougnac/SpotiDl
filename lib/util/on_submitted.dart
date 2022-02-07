@@ -5,16 +5,16 @@ import 'package:ffmpeg_kit_flutter_audio/ffmpeg_kit.dart';
 import 'package:ffmpeg_kit_flutter_audio/return_code.dart';
 import 'package:flutter/material.dart';
 import 'dart:io';
-import 'package:spotidl/util/get_music_directory.dart';
-import 'package:spotidl/util/safe_file_name.dart';
-import 'package:spotidl/util/to_stream.dart';
-import 'package:spotidl/util/write_tags.dart';
-import 'package:spotidl/util/get_infos.dart';
+import './get_music_directory.dart';
+import './safe_file_name.dart';
+import './to_stream.dart';
+import './write_tags.dart';
+import './get_infos.dart';
 import 'package:path/path.dart' as path;
 import 'package:http/http.dart' as http;
 import 'package:permission_handler/permission_handler.dart';
 import 'package:spotify/spotify.dart';
-import 'package:spotidl/errors/not_found.dart';
+import '../errors/not_found.dart';
 
 onSubmitted(String song, BuildContext context) async {
   final musicDir = getMusicDirectory();

@@ -3,9 +3,9 @@ export 'home_page.dart';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:spotidl/util/get_infos.dart';
-import 'package:spotidl/util/on_submitted.dart';
-import 'package:spotidl/util/palette.dart';
+import '../../util/get_infos.dart';
+import '../../util/on_submitted.dart';
+import '../../util/palette.dart';
 import 'package:spotify/spotify.dart' show Track;
 
 class HomePage extends StatelessWidget {

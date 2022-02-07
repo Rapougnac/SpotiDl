@@ -1,7 +1,7 @@
 export 'get_infos.dart';
-import 'package:spotidl/errors/not_found.dart';
+import '../errors/not_found.dart';
 import 'package:spotify/spotify.dart';
-import 'package:spotidl/crendentials.dart' as creds;
+import '../crendentials.dart' as creds;
 
 getInfos(String url) async {
   final credentials = SpotifyApiCredentials(

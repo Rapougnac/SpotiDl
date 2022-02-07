@@ -5,3 +5,4 @@ linter:
     avoid_print: true
     prefer_single_quotes: true
     avoid_slow_async_io: true
+    prefer_relative_imports: true

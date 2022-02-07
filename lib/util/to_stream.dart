@@ -1,12 +1,12 @@
 export 'to_stream.dart';
 
 import 'dart:convert';
-import 'package:spotidl/errors/not_found.dart';
+import '../errors/not_found.dart';
 import 'package:http/http.dart' as http;
-import 'package:spotidl/models/sponsor_block.dart';
-import 'package:spotidl/models/video_renderer.dart';
+import '../models/sponsor_block.dart';
+import '../models/video_renderer.dart';
 import 'package:spotify/spotify.dart';
-import 'package:spotidl/crendentials.dart' as creds;
+import '../crendentials.dart' as creds;
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:crypto/crypto.dart';
 

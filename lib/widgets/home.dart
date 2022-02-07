@@ -1,7 +1,7 @@
 export 'home.dart';
 
 import 'package:flutter/material.dart';
-import 'package:spotidl/widgets/screens/settings_page.dart';
+import './screens/settings_page.dart';
 import 'screens/home_page.dart';
 
 class Home extends StatefulWidget {
