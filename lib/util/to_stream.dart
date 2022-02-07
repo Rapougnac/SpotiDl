@@ -212,6 +212,7 @@ String convertSecondsToStringTime(int seconds) {
   return '${minutes.toString().padLeft(2, '0')}:${secondsLeft.toString().padLeft(2, '0')}';
 }
 
+/// Checks if two segments overlap
 bool checkIfSegmentsOverlap(List<Segment> segments) {
   for (int i = 0; i < segments.length - 1; i++) {
     for (int j = i + 1; j < segments.length; j++) {
