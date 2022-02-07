@@ -203,7 +203,7 @@ onSubmitted(String song, BuildContext context) async {
           tags = Tag()
             ..tags = {
               'title': infos.name,
-              'artist': infos.artists?.map((e) => e.name).join('; '),
+              'artist': infos.artists?.map((e) => e.name).join('; ') ?? '',
               'album': infos.album?.name ?? '',
               'track': infos.trackNumber.toString(),
               'disc': infos.discNumber.toString(),
