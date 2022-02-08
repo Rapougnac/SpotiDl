@@ -145,11 +145,6 @@ Future<Stream<List<int>>> _toStream(Uri url, Track infos) async {
     final cachedDurations = <int>[];
     final test = getTimestampsDuration(
         firstVidWithoutSponsor.segments.map((s) => s.segment).toList());
-    // final overlappedDurations = <int>[];
-    int overlapped = 0;
-    if (checkIfSegmentsOverlap(firstVidWithoutSponsor.segments)) {
-      overlapped = overlappedDuration(firstVidWithoutSponsor.segments).floor();
-    }
     for (int i = 0; i < firstVidWithoutSponsor.segments.length; i++) {
       var segment = firstVidWithoutSponsor.segments[i].segment;
       var elapsedTime = (segment[1] - segment[0]).floor();
@@ -157,9 +152,9 @@ Future<Stream<List<int>>> _toStream(Uri url, Track infos) async {
     }
     var videoDuration = firstVid.duration;
     final summedDurations =
-        cachedDurations.reduce((a, b) => a + b) - (test ?? 0).floor();
+        convertStringTimeToSeconds(videoDuration) - (test ?? 0).floor();
     final trueDurationOfVideo = convertSecondsToStringTime(
-      convertStringTimeToSeconds(videoDuration) - summedDurations,
+      summedDurations,
     );
     final approximativeDuration =
         trueDurationOfVideo.substring(1, trueDurationOfVideo.length - 1);
