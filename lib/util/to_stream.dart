@@ -125,15 +125,18 @@ Future<Stream<List<int>>> _toStream(Uri url, Track infos) async {
   // Parse the duration to get only the minutes and seconds, result: 0:0
   final durationFromInfos = durationWithoutMilliseconds.substring(
       1, durationWithoutMilliseconds.length - 1);
-  final parsedDuration = parsed.firstWhere((el) =>
-      el.duration.substring(0, el.duration.length - 1) == durationFromInfos);
+  final parsedDuration = parsed.firstWhere(
+    (el) =>
+        el.duration.substring(0, el.duration.length - 1) == durationFromInfos,
+  );
   // If no sponsor is found, return the original stream
   if (firstVidWithoutSponsor == null) {
     // Find the first video in the list that approximately matches the duration
     final parsedDetails = parsed.firstWhere(
-        (d) =>
-            d.duration.substring(0, d.duration.length - 1) == durationFromInfos,
-        orElse: () => parsed[0]);
+      (d) =>
+          d.duration.substring(0, d.duration.length - 1) == durationFromInfos,
+      orElse: () => parsed[0],
+    );
 
     final videoId = parsedDetails.videoId;
     final yt = YoutubeExplode();
@@ -142,22 +145,19 @@ Future<Stream<List<int>>> _toStream(Uri url, Track infos) async {
     final stream = yt.videos.streamsClient.get(streamInfo);
     return stream;
   } else {
-    final cachedDurations = <int>[];
-    final test = getTimestampsDuration(
-        firstVidWithoutSponsor.segments.map((s) => s.segment).toList());
-    for (int i = 0; i < firstVidWithoutSponsor.segments.length; i++) {
-      var segment = firstVidWithoutSponsor.segments[i].segment;
-      var elapsedTime = (segment[1] - segment[0]).floor();
-      cachedDurations.add(elapsedTime);
-    }
-    var videoDuration = firstVid.duration;
-    final summedDurations =
-        convertStringTimeToSeconds(videoDuration) - (test ?? 0).floor();
-    final trueDurationOfVideo = convertSecondsToStringTime(
-      summedDurations,
+    final timestampsDuration = getTimestampsDuration(
+      firstVidWithoutSponsor.segments.map((s) => s.segment).toList(),
     );
-    final approximativeDuration =
-        trueDurationOfVideo.substring(1, trueDurationOfVideo.length - 1);
+    var videoDuration = firstVid.duration;
+    final trueDurationInSeconds = convertStringTimeToSeconds(videoDuration) -
+        (timestampsDuration ?? 0).ceil();
+    final trueDurationOfVideo = convertSecondsToStringTime(
+      trueDurationInSeconds,
+    );
+    final approximativeDuration = trueDurationOfVideo.substring(
+      1,
+      trueDurationOfVideo.length - 1,
+    );
     if (approximativeDuration == durationFromInfos) {
       final videoId = firstVidWithoutSponsor.videoID;
       final yt = YoutubeExplode();
@@ -216,6 +216,7 @@ num? getTimestampsDuration(List<List<num>> timestamps) {
 }
 
 List<List<num>>? getMergedTimestamps(List<List<num>> timestamps) {
+  // Rewritten from: https://github.com/ajayyy/SponsorBlock/blob/master/src/utils.ts#L189
   var deduped = <List<num>>[];
   for (var range in timestamps) {
     final startOverlaps = deduped
@@ -225,13 +226,21 @@ List<List<num>>? getMergedTimestamps(List<List<num>> timestamps) {
 
     if (~startOverlaps != 0 && ~endOverlaps != 0) {
       if (startOverlaps == endOverlaps) return null;
-      final other1 =
-          deduped.sublist(math.max(startOverlaps, endOverlaps), 1)[0];
-      final other2 =
-          deduped.sublist(math.min(startOverlaps, endOverlaps), 1)[0];
+      final other1 = deduped.sublist(
+        math.max(startOverlaps, endOverlaps),
+        1,
+      )[0];
+      final other2 = deduped.sublist(
+        math.min(startOverlaps, endOverlaps),
+        1,
+      )[0];
 
       deduped.add(
-          [math.min(other1[0], other2[0]), math.max(other1[1], other2[1])]);
+        [
+          math.min(other1[0], other2[0]),
+          math.max(other1[1], other2[1]),
+        ],
+      );
     } else if (~startOverlaps != 0) {
       deduped[startOverlaps][1] = range[1];
     } else if (~endOverlaps != 0) {
