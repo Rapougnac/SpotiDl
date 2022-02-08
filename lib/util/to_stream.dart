@@ -9,6 +9,7 @@ import 'package:spotify/spotify.dart';
 import '../crendentials.dart' as creds;
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:crypto/crypto.dart';
+import 'dart:math' as math;
 
 Future<Stream<List<int>>> toStream(String url) async {
   final credentials = SpotifyApiCredentials(
@@ -124,15 +125,18 @@ Future<Stream<List<int>>> _toStream(Uri url, Track infos) async {
   // Parse the duration to get only the minutes and seconds, result: 0:0
   final durationFromInfos = durationWithoutMilliseconds.substring(
       1, durationWithoutMilliseconds.length - 1);
-  final parsedDuration = parsed.firstWhere((el) =>
-      el.duration.substring(0, el.duration.length - 1) == durationFromInfos);
+  final parsedDuration = parsed.firstWhere(
+    (el) =>
+        el.duration.substring(0, el.duration.length - 1) == durationFromInfos,
+  );
   // If no sponsor is found, return the original stream
   if (firstVidWithoutSponsor == null) {
     // Find the first video in the list that approximately matches the duration
     final parsedDetails = parsed.firstWhere(
-        (d) =>
-            d.duration.substring(0, d.duration.length - 1) == durationFromInfos,
-        orElse: () => parsed[0]);
+      (d) =>
+          d.duration.substring(0, d.duration.length - 1) == durationFromInfos,
+      orElse: () => parsed[0],
+    );
 
     final videoId = parsedDetails.videoId;
     final yt = YoutubeExplode();
@@ -141,25 +145,19 @@ Future<Stream<List<int>>> _toStream(Uri url, Track infos) async {
     final stream = yt.videos.streamsClient.get(streamInfo);
     return stream;
   } else {
-    final cachedDurations = <int>[];
-    // final overlappedDurations = <int>[];
-    int overlapped = 0;
-    if (checkIfSegmentsOverlap(firstVidWithoutSponsor.segments)) {
-      overlapped = overlappedDuration(firstVidWithoutSponsor.segments).floor();
-    }
-    for (int i = 0; i < firstVidWithoutSponsor.segments.length; i++) {
-      var segment = firstVidWithoutSponsor.segments[i].segment;
-      var elapsedTime = (segment[1] - segment[0]).floor();
-      cachedDurations.add(elapsedTime);
-    }
-    var videoDuration = firstVid.duration;
-    final summedDurations =
-        cachedDurations.reduce((a, b) => a + b) - overlapped;
-    final trueDurationOfVideo = convertSecondsToStringTime(
-      convertStringTimeToSeconds(videoDuration) - summedDurations,
+    final timestampsDuration = getTimestampsDuration(
+      firstVidWithoutSponsor.segments.map((s) => s.segment).toList(),
     );
-    final approximativeDuration =
-        trueDurationOfVideo.substring(1, trueDurationOfVideo.length - 1);
+    var videoDuration = firstVid.duration;
+    final trueDurationInSeconds = convertStringTimeToSeconds(videoDuration) -
+        (timestampsDuration ?? 0).ceil();
+    final trueDurationOfVideo = convertSecondsToStringTime(
+      trueDurationInSeconds,
+    );
+    final approximativeDuration = trueDurationOfVideo.substring(
+      1,
+      trueDurationOfVideo.length - 1,
+    );
     if (approximativeDuration == durationFromInfos) {
       final videoId = firstVidWithoutSponsor.videoID;
       final yt = YoutubeExplode();
@@ -212,24 +210,49 @@ String convertSecondsToStringTime(int seconds) {
   return '${minutes.toString().padLeft(2, '0')}:${secondsLeft.toString().padLeft(2, '0')}';
 }
 
-/// Checks if two segments overlap
-bool checkIfSegmentsOverlap(List<Segment> segments) {
-  for (int i = 0; i < segments.length - 1; i++) {
-    for (int j = i + 1; j < segments.length; j++) {
-      if (segments[i].segment.last > segments[j].segment.first) {
-        return true;
-      }
-    }
-  }
-  return false;
+num? getTimestampsDuration(List<List<num>> timestamps) {
+  return getMergedTimestamps(timestamps)
+      ?.fold(0, (acc, range) => (acc ?? 0) + (range[1] - range[0]));
 }
 
-/// Calculates the duration of the segments without the overlap
-double overlappedDuration(List<Segment> segments) {
-  double durationWithoutOverlap = 0;
-  for (int i = 0; i < segments.length - 1; i++) {
-    durationWithoutOverlap +=
-        segments[i].segment.last - segments[i].segment.first;
+List<List<num>>? getMergedTimestamps(List<List<num>> timestamps) {
+  // Rewritten from: https://github.com/ajayyy/SponsorBlock/blob/master/src/utils.ts#L189
+  var deduped = <List<num>>[];
+  for (var range in timestamps) {
+    final startOverlaps = deduped
+        .indexWhere((other) => range[0] >= other[0] && range[0] <= other[1]);
+    final endOverlaps = deduped
+        .indexWhere((other) => range[1] >= other[0] && range[1] <= other[1]);
+
+    if (~startOverlaps != 0 && ~endOverlaps != 0) {
+      if (startOverlaps == endOverlaps) return null;
+      final other1 = deduped.sublist(
+        math.max(startOverlaps, endOverlaps),
+        1,
+      )[0];
+      final other2 = deduped.sublist(
+        math.min(startOverlaps, endOverlaps),
+        1,
+      )[0];
+
+      deduped.add(
+        [
+          math.min(other1[0], other2[0]),
+          math.max(other1[1], other2[1]),
+        ],
+      );
+    } else if (~startOverlaps != 0) {
+      deduped[startOverlaps][1] = range[1];
+    } else if (~endOverlaps != 0) {
+      deduped[endOverlaps][0] = range[0];
+    } else {
+      deduped.add(range.sublist(0));
+    }
+
+    deduped = deduped
+        .where((other) => !(other[0] > range[0] && other[1] < range[1]))
+        .toList();
   }
-  return durationWithoutOverlap;
+
+  return deduped;
 }
