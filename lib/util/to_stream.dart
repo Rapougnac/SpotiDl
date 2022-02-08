@@ -9,6 +9,7 @@ import 'package:spotify/spotify.dart';
 import '../crendentials.dart' as creds;
 import 'package:youtube_explode_dart/youtube_explode_dart.dart';
 import 'package:crypto/crypto.dart';
+import 'dart:math' as math;
 
 Future<Stream<List<int>>> toStream(String url) async {
   final credentials = SpotifyApiCredentials(
@@ -142,6 +143,8 @@ Future<Stream<List<int>>> _toStream(Uri url, Track infos) async {
     return stream;
   } else {
     final cachedDurations = <int>[];
+    final test = getTimestampsDuration(
+        firstVidWithoutSponsor.segments.map((s) => s.segment).toList());
     // final overlappedDurations = <int>[];
     int overlapped = 0;
     if (checkIfSegmentsOverlap(firstVidWithoutSponsor.segments)) {
@@ -154,7 +157,7 @@ Future<Stream<List<int>>> _toStream(Uri url, Track infos) async {
     }
     var videoDuration = firstVid.duration;
     final summedDurations =
-        cachedDurations.reduce((a, b) => a + b) - overlapped;
+        cachedDurations.reduce((a, b) => a + b) - (test ?? 0).floor();
     final trueDurationOfVideo = convertSecondsToStringTime(
       convertStringTimeToSeconds(videoDuration) - summedDurations,
     );
@@ -232,4 +235,73 @@ double overlappedDuration(List<Segment> segments) {
         segments[i].segment.last - segments[i].segment.first;
   }
   return durationWithoutOverlap;
+}
+
+String? getFormattedTime(num seconds, {bool precise = false}) {
+  seconds = math.max(seconds, 0);
+
+  final hours = (seconds / 60 / 60).floor();
+  final minutes = (seconds / 60).floor() % 60;
+  var minutesDisplay = minutes.toString();
+  var secondsNum = seconds % 60;
+  if (!precise) {
+    secondsNum = secondsNum.floor();
+  }
+
+  var secondsDisplay =
+      !precise ? secondsNum.toStringAsFixed(3) : secondsNum.toString();
+  if (secondsNum < 10) {
+    secondsDisplay = '0' + secondsDisplay;
+  }
+  if (hours == 0 && minutes < 10) {
+    minutesDisplay = '0' + minutesDisplay;
+  }
+  if (hours.isNaN || minutes.isNaN) {
+    return null;
+  }
+
+  final formatted = (hours != 0 ? hours.toString() + ':' : '') +
+      minutesDisplay +
+      ':' +
+      secondsDisplay;
+
+  return formatted;
+}
+
+num? getTimestampsDuration(List<List<num>> timestamps) {
+  return getMergedTimestamps(timestamps)
+      ?.fold(0, (acc, range) => (acc ?? 0) + (range[1] - range[0]));
+}
+
+List<List<num>>? getMergedTimestamps(List<List<num>> timestamps) {
+  var deduped = <List<num>>[];
+  for (var range in timestamps) {
+    final startOverlaps = deduped
+        .indexWhere((other) => range[0] >= other[0] && range[0] <= other[1]);
+    final endOverlaps = deduped
+        .indexWhere((other) => range[1] >= other[0] && range[1] <= other[1]);
+
+    if (~startOverlaps != 0 && ~endOverlaps != 0) {
+      if (startOverlaps == endOverlaps) return null;
+      final other1 =
+          deduped.sublist(math.max(startOverlaps, endOverlaps), 1)[0];
+      final other2 =
+          deduped.sublist(math.min(startOverlaps, endOverlaps), 1)[0];
+
+      deduped.add(
+          [math.min(other1[0], other2[0]), math.max(other1[1], other2[1])]);
+    } else if (~startOverlaps != 0) {
+      deduped[startOverlaps][1] = range[1];
+    } else if (~endOverlaps != 0) {
+      deduped[endOverlaps][0] = range[0];
+    } else {
+      deduped.add(range.sublist(0));
+    }
+
+    deduped = deduped
+        .where((other) => !(other[0] > range[0] && other[1] < range[1]))
+        .toList();
+  }
+
+  return deduped;
 }
