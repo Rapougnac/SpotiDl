@@ -215,59 +215,6 @@ String convertSecondsToStringTime(int seconds) {
   return '${minutes.toString().padLeft(2, '0')}:${secondsLeft.toString().padLeft(2, '0')}';
 }
 
-/// Checks if two segments overlap
-bool checkIfSegmentsOverlap(List<Segment> segments) {
-  for (int i = 0; i < segments.length - 1; i++) {
-    for (int j = i + 1; j < segments.length; j++) {
-      if (segments[i].segment.last > segments[j].segment.first) {
-        return true;
-      }
-    }
-  }
-  return false;
-}
-
-/// Calculates the duration of the segments without the overlap
-double overlappedDuration(List<Segment> segments) {
-  double durationWithoutOverlap = 0;
-  for (int i = 0; i < segments.length - 1; i++) {
-    durationWithoutOverlap +=
-        segments[i].segment.last - segments[i].segment.first;
-  }
-  return durationWithoutOverlap;
-}
-
-String? getFormattedTime(num seconds, {bool precise = false}) {
-  seconds = math.max(seconds, 0);
-
-  final hours = (seconds / 60 / 60).floor();
-  final minutes = (seconds / 60).floor() % 60;
-  var minutesDisplay = minutes.toString();
-  var secondsNum = seconds % 60;
-  if (!precise) {
-    secondsNum = secondsNum.floor();
-  }
-
-  var secondsDisplay =
-      !precise ? secondsNum.toStringAsFixed(3) : secondsNum.toString();
-  if (secondsNum < 10) {
-    secondsDisplay = '0' + secondsDisplay;
-  }
-  if (hours == 0 && minutes < 10) {
-    minutesDisplay = '0' + minutesDisplay;
-  }
-  if (hours.isNaN || minutes.isNaN) {
-    return null;
-  }
-
-  final formatted = (hours != 0 ? hours.toString() + ':' : '') +
-      minutesDisplay +
-      ':' +
-      secondsDisplay;
-
-  return formatted;
-}
-
 num? getTimestampsDuration(List<List<num>> timestamps) {
   return getMergedTimestamps(timestamps)
       ?.fold(0, (acc, range) => (acc ?? 0) + (range[1] - range[0]));
